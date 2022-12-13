@@ -1,24 +1,14 @@
-Contact
+Installation
 ==========================================================
 
 
-Issue Tracker
+Configuration
 ----------------------
-https://github.com/Hendricks27/egh/issues
 
-
-Contact
+Docker Container
 ----------------------
-Email:
 
-
-
-
-
-
-
-
-
-
-
+Run
+~~~~~~~~~~
+Set up port and bind path...
 

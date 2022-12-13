@@ -11,6 +11,7 @@ Welcome to washu-epigenome-browser-helper's documentation!
    :caption: Contents:
 
    quick
+   install
    conversion
    api
    faq
