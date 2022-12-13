@@ -1,0 +1,8 @@
+flask
+numpy
+pandas
+matplotlib
+seaborn
+wordcloud
+lxml
+scipy

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualization</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="/renderer.js"></script>
+</head>
+
+
+<body style='margin: 0; font-family: "adobe-caslon-pro",Georgia,"Times New Roman",serif; '>
+    <div style="position: relative; min-height: 100vh; ">
+    <div id="header"></div>
+    <div id="content" style="margin: 5px; padding-bottom: 0px; ">
+        <div id="input_container" style="width: 70%; margin: auto">
+            <p style="width: 100%; ">
+                This system is designed to help you relieve from file format converting<br>
+                And take you to the browser immediately<br>
+            </p>
+
+            <form action="file_upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="file"><br><br>
+
+
+                <input type="radio" id="task_type_1" name="task_type" value="Distribution" checked>
+                <label for="task_type_1">bedgraph</label><br>
+
+                <input type="radio" id="task_type_2" name="task_type" value="Correlation">
+                <label for="task_type_2">qbed</label><br>
+
+
+                <br><br>
+                <input type="submit" value="Process">
+
+            </form>
+
+            <br><br><br><br><br><br>
+
+
+        </div>
+        <div id="loading_container" style="width: 70%; height: 100%; margin: auto; text-align: center">
+            <p id="submit_status" style="font-size: 25px;"></p>
+            <p id="loading"></p>
+        </div>
+        <div id="result_container" style="width: 70%; margin: auto; text-align: center">
+            <div id="result_container_status"></div>
+            <div id="result_container_additional"></div><br>
+            <div id="result_container_stat"></div><br>
+            <div id="result_container_json" style="text-align: left"></div><br><br><br><br><br>
+        </div>
+    </div>
+    <div id="footer" style="position: absolute; bottom: 0; width: 100%; height: 80px;"></div>
+    </div>
+    <script>
+        "use strict";
+
+        // get common elements
+
+        jQuery.get("./header", function (d){
+            document.getElementById("header").innerHTML = d;
+        })
+
+        jQuery.get("./footer", function (d){
+            document.getElementById("footer").innerHTML = d;
+        })
+    </script>
+
+    <script>
+        "use strict";
+
+        let task_id;
+        let submit_result;
+        let retrieve_result;
+
+        let submitURL, retrieveURL;
+
+        let retrieve_counter = 0;
+        let retrieve_interval = 1000;
+
+
+        function show(index){
+            for (let eleid of ["input_container", "loading_container", "result_container", ]){
+                let ele = document.getElementById(eleid);
+                if (index == eleid){
+                    ele.style.display = "";
+                }
+                else {
+                    ele.style.display = "none";
+                }
+            }
+        }
+
+
+        function upload(ele){
+            let photo = document.getElementById("image-file").files[0];
+            let formData = new FormData();
+
+            formData.append("photo", photo);
+            fetch('/file_upload', {method: "POST", body: formData});
+        }
+
+
+        function submit(){
+            // Template for Flask
+            let app_name = "{{app_name}}";
+            if (app_name.includes("app_name")){
+                app_name = ""
+            }
+
+            let para = {};
+            let seq = document.getElementById("input_seq").value.trim();
+            para["seq"] = seq;
+
+            let submitoptions = document.getElementById("submitoption");
+            for (let formEle of submitoptions.getElementsByTagName("form")){
+                let parakey = formEle.name;
+                for (let radioButton of formEle.getElementsByTagName("input")){
+                    if (radioButton.name != parakey){
+                        throw "Issue"
+                    }
+                    if (radioButton.checked){
+                        para[parakey] = radioButton.value;
+                    }
+                }
+            }
+
+
+            retrieve_counter = 0;
+
+            jQuery.post("./submit", {"task": JSON.stringify(para), "developer_email": app_name+"FrontEnd@glyomics.org"}).then(function (d){
+                task_id = d[0].id;
+                submit_result = d[0];
+                show("loading_container");
+                document.getElementById("submit_status").innerHTML = "<br><br><br>Submitted successfully!";
+
+                setTimeout(retrieve, retrieve_interval)
+            })
+        }
+
+        function retrieve(){
+
+            var url = new URL(window.location);
+            var search_params = url.searchParams;
+            search_params.set('task_id', task_id);
+            url.search = search_params.toString();
+            window.history.pushState('', '', url.toString());
+
+
+            retrieve_counter += 1;
+            jQuery.post("./retrieve", {"task_id": task_id}).then(function (d){
+
+                if (retrieve_counter > 5){
+                    retrieve_interval = 3000;
+                }
+                else if (retrieve_counter > 10) {
+                    retrieve_interval = 5000;
+                }
+
+                let dotnum = retrieve_counter % 3 + 1;
+                let dotstr = ".".repeat(dotnum);
+                document.getElementById("submit_status").innerHTML = "<br><br><br>Searching your glycan sequence" + dotstr;
+                document.getElementById("loading").innerHTML = "The page refreshes every " + parseInt(retrieve_interval/1000) + "s.<br>" +
+                                "Please wait.";
+
+                if (!(d[0].error === undefined)){
+                    if (d[0].error.includes("not found")){
+                        retrieve_result = d[0];
+                        retrieve_result.error = [d[0].error];
+                        retrieve_result.stat = {"runtime": 0.01, "cached": false}
+                        renderResult();
+                        return;
+                    }
+                }
+
+                if (!d[0].finished){
+                    setTimeout(retrieve, retrieve_interval);
+                    return;
+                }
+
+                retrieve_result = d[0];
+                renderResult();
+
+            })
+
+        }
+
+        function renderResult(){
+            show("result_container");
+
+            let result = retrieve_result.result;
+            let error = retrieve_result.error;
+            let stat = retrieve_result.stat;
+
+            let result_container_status = document.getElementById("result_container_status");
+            let result_container_stat = document.getElementById("result_container_stat");
+            let result_container_additional = document.getElementById("result_container_additional");
+
+            result_container_status.innerHTML = "";
+            result_container_stat.innerHTML = "";
+            result_container_additional.innerHTML = "";
+
+            let stat_table = "" +
+                "<table style='width: 100%; border: black solid 3px; font-size: 20px;'>" +
+                "<tr style='height: 32px; background-color: lightgrey'><td>Webservice Request</td><td><a onclick='RenderObj(submit_result)'>Click me!</a></td></tr>" +
+                "<tr style='height: 32px; background-color: grey'><td>Webservice Response</td><td><a onclick='RenderObj(retrieve_result)'>Click me!</a></td></tr>" +
+                "<tr style='height: 32px; background-color: lightgrey'><td>Compute time</td><td>"+stat.runtime.toFixed(2)+"s</td></tr>" +
+                "<tr style='height: 32px; background-color: grey'><td>Cached</td><td>"+stat.cached+"</td></tr>" +
+                "</table>";
+
+            result_container_stat.innerHTML += stat_table;
+
+            renderResultMore();
+
+        }
+
+        show("input_container");
+
+        function RenderObj(obj){
+            let jv = new JSONViewer();
+            jv.render([obj], "result_container_json")
+            document.getElementById('result_container_json').scrollIntoView();
+        }
+
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const tmp_task_id = urlParams.get('task_id');
+
+        if (tmp_task_id !== null && tmp_task_id !== task_id) {
+            task_id = tmp_task_id;
+            retrieve();
+        }
+
+    </script>
+
+</body>
+</html>
+

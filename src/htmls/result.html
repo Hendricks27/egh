@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualization</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+
+<body style='margin: 0; font-family: "adobe-caslon-pro",Georgia,"Times New Roman",serif; '>
+
+    <div style="position: relative; min-height: 100vh; ">
+
+        <div id="header"></div>
+
+        <div id="content" style="width: 70%; margin: auto">
+            <h3 id="delete_me">Your dataset has been submitted successfully.</h3>
+            <h3 id="info">Please wait...</h3>
+            <div id="result" href=""></div>
+            <div id="list_id" data-list_id="{{list_id}}"></div>
+        </div>
+        <br><br><br><br><br><br><br><br><br><br><br>
+        <div id="footer" style="position: absolute; bottom: 0; width: 100%; height: 80px;"></div>
+
+    </div>
+
+    <script>
+        "use strict";
+
+        jQuery.get("./header", function (d){
+            document.getElementById("header").innerHTML = d;
+        })
+
+        jQuery.get("./footer", function (d){
+            document.getElementById("footer").innerHTML = d;
+        })
+        let list_id = document.getElementById("list_id").getAttribute("data-list_id");
+
+        let start_time_stamp = new Date().getTime();
+
+        let wait_cycle = ["Please wait.", "Please wait..", "Please wait..."];
+        let wait_cycle_index = 0;
+
+
+        let calculation_time = 0.0;
+
+        var result = undefined;
+        var table_data = undefined;
+
+        function query(){
+            let request_URL = "./retrieve?list_id=" + list_id;
+            jQuery.getJSON(request_URL, function (d){
+                let tmp = d[0];
+
+                // in ms
+                let time_lapsed = new Date().getTime() - start_time_stamp;
+
+                if (tmp.finished){
+                    calculation_time = Math.floor(tmp.stat.runtime);
+                    result = tmp.result;
+                    table_data = tmp.result;
+                    renderFinalVis();
+                }
+                else{
+                    wait_cycle_index += 1;
+                    wait_cycle_index = wait_cycle_index % 3;
+
+                    let additional_message = "";
+                    if (time_lapsed > 10*1000){
+                        // Takes more than 10 seconds after submission
+                        additional_message = "It might take longer for large file. "
+                    }
+
+                    let info = document.getElementById("info");
+                    info.innerText = additional_message + wait_cycle[wait_cycle_index];
+
+                    setTimeout(query, 500)
+                }
+            })
+        }
+
+        function renderFinalVis(){
+            let info = document.getElementById("info");
+            let res_ele = document.getElementById("result");
+
+            info.innerText = "Finished! (After " + calculation_time + "s)";
+            info.innerText += ""
+
+            document.getElementById("delete_me").innerText = "";
+
+            console.log(result);
+
+            var aele = document.createElement("a");
+            aele.href = result
+            aele.text = "Click me!"
+            // aele.style = "display: block; width: 80%; margin-left: auto; margin-right: auto;"
+            res_ele.appendChild(aele)
+
+        }
+
+        query();
+
+
+    </script>
+
+
+</body>
+</html>
