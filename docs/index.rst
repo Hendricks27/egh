@@ -10,11 +10,17 @@ Welcome to washu-epigenome-browser-helper's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   quick
+   conversion
+   api
+   faq
+   contact
+
+
 
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
