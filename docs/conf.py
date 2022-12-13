@@ -10,7 +10,7 @@
 import sphinx_rtd_theme
 
 
-project = 'washu-epigenome-browser-helper'
+project = 'Washu Epigenome Browser Helper'
 copyright = '2022, Wenjin Zhang'
 author = 'Wenjin Zhang'
 
