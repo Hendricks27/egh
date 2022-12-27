@@ -636,15 +636,12 @@ class APIFramework(object):
     def upload_file(self):
         if flask.request.method == 'POST':
 
-            print(flask.request.files)
             if 'file' not in flask.request.files:
                 return flask.abort(400)
 
             files = flask.request.files.getlist("file")
 
             task_id = self.random_hash()
-
-            print(task_id)
 
 
             file_name_mapping = {}
@@ -818,6 +815,7 @@ class APIFramework(object):
             # http://epigenomegateway.wustl.edu
             response.headers.add('Access-Control-Allow-Origin', '*')
             response.headers.add('Access-Control-Allow-Private-Network', "true")
+            response.headers.add('Vary', "*")
 
             return response
 
@@ -1063,7 +1061,7 @@ class APIFrameworkWithFrontEnd(APIFramework):
                    )
         def static_file1(path):
             p = "./task/" + path
-            return flask.send_file(p, conditional=True)
+            return flask.send_file(p, conditional=True, as_attachment=True,)
 
 
     def google_analytics_script(self):

@@ -1,10 +1,3 @@
 flask
 flask_cors
 pyopenssl
-numpy
-pandas
-matplotlib
-seaborn
-wordcloud
-lxml
-scipy

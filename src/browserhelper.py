@@ -22,6 +22,7 @@ class Final(APIFrameworkWithFrontEnd):
     # TODO list (Front End)
     # Status queue
     # New result page (Manifest, status, URL embeded parameters)
+    #
 
 
     def get_file_type(self, file_path):
@@ -133,11 +134,6 @@ class Final(APIFrameworkWithFrontEnd):
             os.system(cmd1)
             os.system(cmd2)
 
-        elif res["original_type"] in ["xxx"]:
-            cmd1 = ""
-
-            res["converted_type"] = "bigwig"
-            res["converted_path"] += ".bigwig"
         else:
 
             ""
