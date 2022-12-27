@@ -1,4 +1,6 @@
 flask
+flask_cors
+pyopenssl
 numpy
 pandas
 matplotlib

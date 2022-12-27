@@ -150,6 +150,11 @@ class Final(APIFrameworkWithFrontEnd):
 
         self.output(2, "Worker-%s is starting up" % (pid))
 
+        tmp_port = ""
+        if params["public_facing_port"] not in [22, "22"]:
+            tmp_port = ":%s" % params["public_facing_port"]
+        public_facing_url = "%s://%s%s/" % (params["public_facing_protocol"], params["public_facing_host"], tmp_port)
+
         self.output(2, "Worker-%s is ready to take job" % (pid))
 
         while True:
@@ -169,6 +174,7 @@ class Final(APIFrameworkWithFrontEnd):
             working_dir_output = "./task/" + list_id + "/output/"
 
             datahub = []
+            mapping = []
             datahub_file = working_dir_output + "/datahub.json"
             for original_file_name in task_detail["file_mapping"]:
                 hash_file_name = task_detail["file_mapping"][original_file_name]
@@ -184,10 +190,12 @@ class Final(APIFrameworkWithFrontEnd):
                 converted_type = converting_process["converted_type"]
                 converted_path = converting_process["converted_path"]
 
+                mapping.append((original_file_name, original_type, converted_type, converted_path))
+
                 datahub0 = {
                     "type": converted_type,
                     "name": original_file_name,
-                    "url": "https://localhost:10981/%s" % converted_path,
+                    "url": "%s%s" % (public_facing_url, converted_path),
                     "options": {
                         # "color": "blue"
                     },
@@ -199,10 +207,18 @@ class Final(APIFrameworkWithFrontEnd):
 
 
             json.dump(datahub, open(datahub_file, "w"))
-            result = "https://epigenomegateway.wustl.edu/browser/?genome={genome}&hub={datahub}".format(
+
+
+            result_url = "https://epigenomegateway.wustl.edu/browser/?genome={genome}&hub={datahub}".format(
                 genome="hg38",
-                datahub="https://localhost:10981" + datahub_file[1:]
+                datahub=public_facing_url + datahub_file[1:]
             )
+
+            result = {
+                "gburl": result_url,
+                "dhjson": datahub_file[1:],
+                "file_mapping": mapping
+            }
 
             calculation_end_time = time.time()
             calculation_time_cost = calculation_end_time - calculation_start_time

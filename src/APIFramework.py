@@ -636,12 +636,15 @@ class APIFramework(object):
     def upload_file(self):
         if flask.request.method == 'POST':
 
+            print(flask.request.files)
             if 'file' not in flask.request.files:
                 return flask.abort(400)
 
             files = flask.request.files.getlist("file")
 
             task_id = self.random_hash()
+
+            print(task_id)
 
 
             file_name_mapping = {}
