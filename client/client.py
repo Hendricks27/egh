@@ -2,6 +2,7 @@
 
 import os
 import json
+import sys
 import time
 import requests
 
@@ -11,7 +12,7 @@ class BrowserHelperClient(object):
     _base_url_port = 10981
     _base_url = ""
 
-    def __int__(self):
+    def __init__(self):
         self._base_url = self.make_url()
 
     def update_url(self):
@@ -82,7 +83,7 @@ if __name__ == "__main__":
     bhc = BrowserHelperClient()
 
     # TODO Remember to set it to False
-    if True:
+    if False:
         bhc.set_base_url_host("localhost")
         bhc.set_base_url_port("10981")
         bhc.set_base_url_protocol("https")
