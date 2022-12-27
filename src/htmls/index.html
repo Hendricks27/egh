@@ -19,19 +19,8 @@
             </p>
 
             <form action="file_upload" method="post" enctype="multipart/form-data">
-                <input type="file" name="file"><br><br>
-
-
-                <input type="radio" id="task_type_1" name="task_type" value="Distribution" checked>
-                <label for="task_type_1">bedgraph</label><br>
-
-                <input type="radio" id="task_type_2" name="task_type" value="Correlation">
-                <label for="task_type_2">qbed</label><br>
-
-
-                <br><br>
+                <input type="file" name="file" multiple><br><br>
                 <input type="submit" value="Process">
-
             </form>
 
             <br><br><br><br><br><br>
@@ -92,11 +81,12 @@
 
 
         function upload(ele){
-            let photo = document.getElementById("image-file").files[0];
+            let photo = document.getElementById("image-file").files;
+            console.log(photo)
             let formData = new FormData();
 
             formData.append("photo", photo);
-            fetch('/file_upload', {method: "POST", body: formData});
+            // fetch('/file_upload', {method: "POST", body: formData});
         }
 
 
@@ -136,6 +126,7 @@
                 setTimeout(retrieve, retrieve_interval)
             })
         }
+
 
         function retrieve(){
 

@@ -460,6 +460,10 @@ class APIFramework(object):
     def str2hash(s):
         return hashlib.md5(s).hexdigest()
 
+    _all_letters = string.ascii_uppercase + string.ascii_lowercase + string.digits
+    def random_hash(self):
+        return self.str2hash(''.join(random.choices(self._all_letters, k=10000)).encode("utf-8"))
+
     def submit(self):
         if flask.request.method in ['GET', 'POST']:
             p = self.api_para()
@@ -635,34 +639,32 @@ class APIFramework(object):
             if 'file' not in flask.request.files:
                 return flask.abort(400)
 
-            file = flask.request.files['file']
-            task_type = flask.request.form["task_type"]
+            files = flask.request.files.getlist("file")
 
-            filename = werkzeug.utils.secure_filename(file.filename)
+            task_id = self.random_hash()
 
-            tmp_filename = "./tmp/" + ''.join(random.choice(string.ascii_lowercase) for i in range(100))
-            file.save(tmp_filename)
-            file_hash = self.str2hash(open(tmp_filename).read().encode("utf-8"))
 
-            if file.filename == '':
-                response = flask.jsonify('No selected file')
-                return response
+            file_name_mapping = {}
+            for file in files:
+                filename = werkzeug.utils.secure_filename(file.filename)
+                hashfilename = self.str2hash(''.join(random.choices(string.ascii_uppercase + string.digits, k=1000)).encode("utf-8"))
 
-            task_detail = self.form_task(
-                {
-                    "file_hash": file_hash,
-                    "task_type": task_type
-                }
-            )
-            task_id = task_detail["id"]
+                file_name_mapping[filename] = hashfilename
 
-            if self.allow_file_ext(file.filename):
-                shutil.copy(tmp_filename, os.path.join(self.input_file_folder(), task_id))
-                # file.save()
-            else:
-                response = flask.jsonify('File extension is not supported')
+                task_folder = "./task/%s/input" % (task_id)
+                os.makedirs(task_folder, exist_ok=True)
+                os.makedirs(task_folder.replace("input", "output"), exist_ok=True)
+                tmp_filename = "./%s/%s" % (task_folder, hashfilename)
+                file.save(tmp_filename)
 
-                return response
+                if file.filename == '':
+                    response = flask.jsonify('No selected file')
+                    return response
+
+            task_detail = {
+                "id": task_id,
+                "file_mapping": file_name_mapping
+            }
 
             status = {
                 "id": task_id,
