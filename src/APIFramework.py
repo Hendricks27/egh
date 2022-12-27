@@ -661,9 +661,15 @@ class APIFramework(object):
                     response = flask.jsonify('No selected file')
                     return response
 
+            p = self.api_para()
+            assembly = "hg38"
+            if "assembly" in p:
+                assembly = p["assembly"]
+
             task_detail = {
                 "id": task_id,
-                "file_mapping": file_name_mapping
+                "file_mapping": file_name_mapping,
+                "assembly": assembly
             }
 
             status = {

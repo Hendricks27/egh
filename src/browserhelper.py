@@ -9,7 +9,7 @@ import string
 import multiprocessing
 from APIFramework import APIFramework, APIFrameworkWithFrontEnd, queue
 
-
+import conversionscript
 
 class Final(APIFrameworkWithFrontEnd):
 
@@ -17,21 +17,49 @@ class Final(APIFrameworkWithFrontEnd):
     # Delete after certain period, eg 24h
     # More format support (cov, wig, ... )
     # Status queue
-    # Multiple OS support
-    # Genome select
+    # Multiple OS support (Mostly binaries)
+    # Already processed files (bigwig, bigbed, hic, mcool, .... )
 
     # TODO list (Front End)
     # Status queue
     # New result page (Manifest, status, URL embeded parameters)
-    #
+    # Genome select
+
+    _allowed_genome = [
+        "hg19", "hg38",
+        "panTro4", "panTro5", "panTro6",
+        "gorGor3", "gorGor4",
+
+        "nomLeu3",
+        "papAnu2",
+        "rheMac2", "rheMac3", "rheMac8", "rheMac10",
+
+        "calJac3", "calJac4",
+        "bosTau8",
+        "oviAri4",
+
+        "susScr3", "susScr11",
+        "oryCun2",
+        "canFam2", "canFam3",
+
+        "mm9", "mm10", "mm39",
+        "rn4", "rn6", "rn7",
+        "monDom5",
+
+        "galGal5", "galGal6",
+        "xenTro10",
+        "danRer7", "danRer10", "danRer11",
+
+        "sacCer3",
+
+    ]
 
 
     def get_file_type(self, file_path):
 
-
         init = True
         linecount = 0
-        supported_type = ["bed", "bedgraph", "qbed"] # , ""
+        supported_type = ["bed", "bedgraph", "qbed", "cov"] # , ""
         supported_type_flag = {}
         for st in supported_type:
             supported_type_flag[st] = True
@@ -66,6 +94,18 @@ class Final(APIFrameworkWithFrontEnd):
                 if l[4] not in "+-":
                     supported_type_flag["qbed"] = False
 
+
+                # Bismark CoV
+                if len(l) != 6:
+                    supported_type_flag["cov"] = False
+                try:
+                    float(l[3])
+                    int(l[4])
+                    int(l[5])
+                except ValueError:
+                    supported_type_flag["cov"] = False
+
+
         res = None
         for st in reversed(supported_type):
             if supported_type_flag[st]:
@@ -82,7 +122,9 @@ class Final(APIFrameworkWithFrontEnd):
             # "": "",
         }
 
+        # print("\n\n%s\n\n" % assembly)
         chrom_size = f"http://hgdownload.soe.ucsc.edu/goldenPath/{assembly}/bigZips/{assembly}.chrom.sizes"
+        chrom_size = f"./chrom.sizes/{assembly}.chrom.sizes"
 
         file_extension = None
         if original_file_name != None and len(original_file_name.split(".")) > 0:
@@ -102,11 +144,15 @@ class Final(APIFrameworkWithFrontEnd):
 
 
         print(res)
-        if res["original_type"] in ["qbed", "ccf", "bed"]:
+        if res["original_type"] in ["qbed", "ccf", "bed", "cov"]:
 
             tmp_format = "bed"
-            if res["original_type"] != "bed":
+            if res["original_type"] in ["qbed", "ccf"]:
                 tmp_format = "qbed"
+            elif res["original_type"] == "cov":
+                tmp_format = "methylc"
+                conversionscript.cov2methylC(input_path, input_path+".methylc")
+                input_path = input_path+".methylc"
 
             cmd1 = "sort -k1V -k2n -k3n {input_path} > {output_path}.{tmp_format}".format(
                 input_path=input_path, output_path=output_path, tmp_format=tmp_format
@@ -137,8 +183,9 @@ class Final(APIFrameworkWithFrontEnd):
             os.system(cmd1)
             os.system(cmd2)
 
-        else:
+            os.remove("%s.bedgraph" % output_path)
 
+        else:
             ""
 
         return res
@@ -166,7 +213,9 @@ class Final(APIFrameworkWithFrontEnd):
 
             print(task_detail)
             list_id = task_detail["id"]
-            assembly = task_detail.get("assembly", "hg38")
+            assembly = task_detail["assembly"]
+            if assembly not in self._allowed_genome:
+                error.append("Genome Assembly (%s) is not supported" % assembly)
 
             working_dir = "./task/" + list_id + "/"
             working_dir_input = "./task/" + list_id + "/input/"
@@ -205,11 +254,12 @@ class Final(APIFrameworkWithFrontEnd):
                 print(datahub0)
 
 
+            shutil.rmtree(working_dir_input)
+
             json.dump(datahub, open(datahub_file, "w"))
 
-
-            result_url = "https://epigenomegateway.wustl.edu/browser/?genome={genome}&hub={datahub}".format(
-                genome="hg38",
+            result_url = "https://epigenomegateway.wustl.edu/browser/?genome={assembly}&hub={datahub}".format(
+                assembly=assembly,
                 datahub=public_facing_url + datahub_file[1:]
             )
 

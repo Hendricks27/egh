@@ -19,7 +19,49 @@
             </p>
 
             <form action="file_upload" method="post" enctype="multipart/form-data">
+                <label for="assembly">Choose Genome Assembly:</label>
+                <select id="assembly" name="assembly">
+                    <option value="hg19">hg19</option>
+                    <option value="hg38">hg38</option>
+                    <option value="panTro4">panTro4</option>
+                    <option value="panTro5">panTro5</option>
+                    <option value="panTro6">panTro6</option>
+                    <option value="gorGor3">gorGor3</option>
+                    <option value="gorGor4">gorGor4</option>
+                    <option value="nomLeu3">nomLeu3</option>
+                    <option value="papAnu2">papAnu2</option>
+                    <option value="rheMac2">rheMac2</option>
+                    <option value="rheMac3">rheMac3</option>
+                    <option value="rheMac8">rheMac8</option>
+                    <option value="rheMac10">rheMac10</option>
+                    <option value="calJac3">calJac3</option>
+                    <option value="calJac4">calJac4</option>
+                    <option value="bosTau8">bosTau8</option>
+                    <option value="oviAri4">oviAri4</option>
+                    <option value="susScr3">susScr3</option>
+                    <option value="susScr11">susScr11</option>
+                    <option value="oryCun2">oryCun2</option>
+                    <option value="canFam2">canFam2</option>
+                    <option value="canFam3">canFam3</option>
+                    <option value="mm9">mm9</option>
+                    <option value="mm10">mm10</option>
+                    <option value="mm39">mm39</option>
+                    <option value="rn4">rn4</option>
+                    <option value="rn6">rn6</option>
+                    <option value="rn7">rn7</option>
+                    <option value="monDom5">monDom5</option>
+                    <option value="galGal5">galGal5</option>
+                    <option value="galGal6">galGal6</option>
+                    <option value="xenTro10">xenTro10</option>
+                    <option value="danRer7">danRer7</option>
+                    <option value="danRer10">danRer10</option>
+                    <option value="danRer11">danRer11</option>
+                    <option value="dm6">dm6</option>
+                    <option value="ce11">ce11</option>
+                    <option value="sacCer3">sacCer3</option>
+                </select> <br>
                 <input type="file" name="file" multiple><br><br>
+
                 <input type="submit" value="Process">
             </form>
 
