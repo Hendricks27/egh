@@ -18,6 +18,7 @@ class Final(APIFrameworkWithFrontEnd):
     # More format support (cov, wig, ... )
     # Status queue
     # Multiple OS support
+    # Genome select
 
     # TODO list (Front End)
     # Status queue
@@ -61,7 +62,9 @@ class Final(APIFrameworkWithFrontEnd):
                 try:
                     float(l[3])
                 except ValueError:
-                    supported_type_flag["bedgraph"] = False
+                    supported_type_flag["qbed"] = False
+                if l[4] not in "+-":
+                    supported_type_flag["qbed"] = False
 
         res = None
         for st in reversed(supported_type):

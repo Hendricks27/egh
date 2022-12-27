@@ -1986,5 +1986,63 @@
       ]
     },
     "error": []
+  },
+  "85fe878f700a94bad5ab565c6e4fe6c0": {
+    "id": "85fe878f700a94bad5ab565c6e4fe6c0",
+    "submission_original": {},
+    "submission_detail": {
+      "id": "85fe878f700a94bad5ab565c6e4fe6c0",
+      "file_mapping": {
+        "refGene.hg38.Sorted.bed": "20e2e4c7ab8670449ce021c19d5e6ab7"
+      }
+    },
+    "finished": true,
+    "stat": {
+      "start time": 1672120114.283073,
+      "end time": 1672120114.720902,
+      "runtime": 0.43782901763916016
+    },
+    "result": {
+      "gburl": "https://epigenomegateway.wustl.edu/browser/?genome=hg38&hub=https://localhost:10981//task/85fe878f700a94bad5ab565c6e4fe6c0/output//datahub.json",
+      "dhjson": "/task/85fe878f700a94bad5ab565c6e4fe6c0/output//datahub.json",
+      "file_mapping": [
+        [
+          "refGene.hg38.Sorted.bed",
+          "qbed",
+          "qbed",
+          "./task/85fe878f700a94bad5ab565c6e4fe6c0/output/20e2e4c7ab8670449ce021c19d5e6ab7.qbed.gz"
+        ]
+      ]
+    },
+    "error": []
+  },
+  "37ddb64e2544859302dff3bd26cb206f": {
+    "id": "37ddb64e2544859302dff3bd26cb206f",
+    "submission_original": {},
+    "submission_detail": {
+      "id": "37ddb64e2544859302dff3bd26cb206f",
+      "file_mapping": {
+        "refGene.hg38.Sorted.bed": "0959ae9a8f4299fcb2b91e1f556d8773"
+      }
+    },
+    "finished": true,
+    "stat": {
+      "start time": 1672120369.1720278,
+      "end time": 1672120369.544064,
+      "runtime": 0.3720362186431885
+    },
+    "result": {
+      "gburl": "https://epigenomegateway.wustl.edu/browser/?genome=hg38&hub=https://localhost:10981//task/37ddb64e2544859302dff3bd26cb206f/output//datahub.json",
+      "dhjson": "/task/37ddb64e2544859302dff3bd26cb206f/output//datahub.json",
+      "file_mapping": [
+        [
+          "refGene.hg38.Sorted.bed",
+          "bed",
+          "bed",
+          "./task/37ddb64e2544859302dff3bd26cb206f/output/0959ae9a8f4299fcb2b91e1f556d8773.bed.gz"
+        ]
+      ]
+    },
+    "error": []
   }
 }

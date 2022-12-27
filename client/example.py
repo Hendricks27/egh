@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
     files = {
         "testx.bed": "./test.bed",
-        "testy.bedgraph": "./test.bedgraph",
+        # "testy.bedgraph": "./test.bedgraph",
         "testz.qbed": "./test.qbed"
     }
 
