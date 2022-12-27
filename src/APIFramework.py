@@ -688,7 +688,7 @@ class APIFramework(object):
                 self.result_cache[task_id] = status
             self.output(1, "Job received by API: %s" % (task_detail))
 
-        return self.file_upload_finished_page(list_id=task_id)
+        return task_id
 
 
     def download_file(self):

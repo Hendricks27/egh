@@ -1,8 +1,6 @@
 
 
 import os
-import re
-import sys
 import json
 import time
 import requests
@@ -50,9 +48,7 @@ class BrowserHelperClient(object):
         response = requests.post(surl, files=files, data={"assembly": assembly}, verify=False)
 
         assert response.status_code == 200
-        reshtml = response.text
-        p1 = re.compile(r'<div id=\"list_id\" data-list_id=\"(.*)\"></div>')
-        task_id = p1.findall(reshtml)[0]
+        task_id = response.text
         return task_id
 
     def retrieve_simple(self, task_id):

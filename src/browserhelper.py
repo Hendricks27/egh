@@ -15,15 +15,15 @@ class Final(APIFrameworkWithFrontEnd):
 
     # TODO list (Back End)
     # Delete after certain period, eg 24h
-    # More format support (cov, wig, ... )
+    # More format support (wig, ... )
     # Status queue
-    # Multiple OS support (Mostly binaries)
+    # Multiple OS support (Mostly binaries? How)
     # Already processed files (bigwig, bigbed, hic, mcool, .... )
 
     # TODO list (Front End)
     # Status queue
     # New result page (Manifest, status, URL embeded parameters)
-    # Genome select
+
 
     _allowed_genome = [
         "hg19", "hg38",

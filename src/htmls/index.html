@@ -18,7 +18,7 @@
                 And take you to the browser immediately<br>
             </p>
 
-            <form action="file_upload" method="post" enctype="multipart/form-data">
+            <form method="post" enctype="multipart/form-data" id="form123">
                 <label for="assembly">Choose Genome Assembly:</label>
                 <select id="assembly" name="assembly">
                     <option value="hg19">hg19</option>
@@ -60,10 +60,9 @@
                     <option value="ce11">ce11</option>
                     <option value="sacCer3">sacCer3</option>
                 </select> <br>
-                <input type="file" name="file" multiple><br><br>
-
-                <input type="submit" value="Process">
+                <input id="file" type="file" name="file" multiple><br><br>
             </form>
+            <button onclick="submitForm()">Submit</button>
 
             <br><br><br><br><br><br>
 
@@ -73,11 +72,10 @@
             <p id="submit_status" style="font-size: 25px;"></p>
             <p id="loading"></p>
         </div>
+
+        <br><br><br>
         <div id="result_container" style="width: 70%; margin: auto; text-align: center">
-            <div id="result_container_status"></div>
-            <div id="result_container_additional"></div><br>
-            <div id="result_container_stat"></div><br>
-            <div id="result_container_json" style="text-align: left"></div><br><br><br><br><br>
+
         </div>
     </div>
     <div id="footer" style="position: absolute; bottom: 0; width: 100%; height: 80px;"></div>
@@ -108,6 +106,24 @@
         let retrieve_counter = 0;
         let retrieve_interval = 1000;
 
+        function submitForm(){
+
+            let myForm = new FormData(document.getElementById("form123"));
+
+            fetch("./file_upload", {
+                method: 'POST',
+                body: myForm,
+            })
+            .then((response) => response.text())
+            .then((data) => {
+                task_id = data
+                retrieve_counter = 0;
+                show("loading_container");
+                document.getElementById("submit_status").innerHTML = "<br><br><br>Submitted successfully!";
+                setTimeout(retrieve, retrieve_interval)
+            })
+
+        }
 
         function show(index){
             for (let eleid of ["input_container", "loading_container", "result_container", ]){
@@ -122,53 +138,6 @@
         }
 
 
-        function upload(ele){
-            let photo = document.getElementById("image-file").files;
-            console.log(photo)
-            let formData = new FormData();
-
-            formData.append("photo", photo);
-            // fetch('/file_upload', {method: "POST", body: formData});
-        }
-
-
-        function submit(){
-            // Template for Flask
-            let app_name = "{{app_name}}";
-            if (app_name.includes("app_name")){
-                app_name = ""
-            }
-
-            let para = {};
-            let seq = document.getElementById("input_seq").value.trim();
-            para["seq"] = seq;
-
-            let submitoptions = document.getElementById("submitoption");
-            for (let formEle of submitoptions.getElementsByTagName("form")){
-                let parakey = formEle.name;
-                for (let radioButton of formEle.getElementsByTagName("input")){
-                    if (radioButton.name != parakey){
-                        throw "Issue"
-                    }
-                    if (radioButton.checked){
-                        para[parakey] = radioButton.value;
-                    }
-                }
-            }
-
-
-            retrieve_counter = 0;
-
-            jQuery.post("./submit", {"task": JSON.stringify(para), "developer_email": app_name+"FrontEnd@glyomics.org"}).then(function (d){
-                task_id = d[0].id;
-                submit_result = d[0];
-                show("loading_container");
-                document.getElementById("submit_status").innerHTML = "<br><br><br>Submitted successfully!";
-
-                setTimeout(retrieve, retrieve_interval)
-            })
-        }
-
 
         function retrieve(){
 
@@ -181,9 +150,9 @@
 
             retrieve_counter += 1;
             jQuery.post("./retrieve", {"task_id": task_id}).then(function (d){
-
+                console.log(d)
                 if (retrieve_counter > 5){
-                    retrieve_interval = 3000;
+                    retrieve_interval = 3000
                 }
                 else if (retrieve_counter > 10) {
                     retrieve_interval = 5000;
@@ -191,19 +160,10 @@
 
                 let dotnum = retrieve_counter % 3 + 1;
                 let dotstr = ".".repeat(dotnum);
-                document.getElementById("submit_status").innerHTML = "<br><br><br>Searching your glycan sequence" + dotstr;
+                document.getElementById("submit_status").innerHTML = "<br><br><br>Converting" + dotstr;
                 document.getElementById("loading").innerHTML = "The page refreshes every " + parseInt(retrieve_interval/1000) + "s.<br>" +
                                 "Please wait.";
 
-                if (!(d[0].error === undefined)){
-                    if (d[0].error.includes("not found")){
-                        retrieve_result = d[0];
-                        retrieve_result.error = [d[0].error];
-                        retrieve_result.stat = {"runtime": 0.01, "cached": false}
-                        renderResult();
-                        return;
-                    }
-                }
 
                 if (!d[0].finished){
                     setTimeout(retrieve, retrieve_interval);
@@ -224,36 +184,58 @@
             let error = retrieve_result.error;
             let stat = retrieve_result.stat;
 
-            let result_container_status = document.getElementById("result_container_status");
-            let result_container_stat = document.getElementById("result_container_stat");
-            let result_container_additional = document.getElementById("result_container_additional");
+            let result_container = document.getElementById("result_container");
 
-            result_container_status.innerHTML = "";
-            result_container_stat.innerHTML = "";
-            result_container_additional.innerHTML = "";
+            result_container.innerHTML = "";
 
-            let stat_table = "" +
-                "<table style='width: 100%; border: black solid 3px; font-size: 20px;'>" +
-                "<tr style='height: 32px; background-color: lightgrey'><td>Webservice Request</td><td><a onclick='RenderObj(submit_result)'>Click me!</a></td></tr>" +
-                "<tr style='height: 32px; background-color: grey'><td>Webservice Response</td><td><a onclick='RenderObj(retrieve_result)'>Click me!</a></td></tr>" +
-                "<tr style='height: 32px; background-color: lightgrey'><td>Compute time</td><td>"+stat.runtime.toFixed(2)+"s</td></tr>" +
-                "<tr style='height: 32px; background-color: grey'><td>Cached</td><td>"+stat.cached+"</td></tr>" +
-                "</table>";
+            console.log(result)
+            console.log(error)
+            console.log(stat)
 
-            result_container_stat.innerHTML += stat_table;
+            let gburl = result.gburl;
+            let dhjson = result.dhjson;
 
-            renderResultMore();
+            let fileMapping = result.file_mapping;
+
+            console.log(fileMapping)
+
+            result_container.innerHTML += "<a href='"+gburl+"' target='_blank'>WashU Epigenome Browser</a>"
+            result_container.innerHTML += "<br><br><br>"
+
+            result_container.innerHTML += "<h3>Manifest</h3>"
+
+            let manifest = document.createElement("table");
+            manifest.style = "width: 100%"
+            manifest.innerHTML = "  <tr>\n" +
+                "    <th>Original File</th>\n" +
+                "    <th>Converted File</th>\n" +
+                "    <th>Error</th>\n" +
+                "  </tr>" +
+                "<tr><td>Datahub</td><td><a href='"+dhjson+"' target='_blank'>Datahub</a></td><td>None</td></tr>"
+
+            for (let entries of fileMapping){
+                let indexFile = ""
+                if (["qbed", "bed"].includes(entries[2])){
+                    indexFile = "&nbsp<a href='"+entries[3]+".tbi' target='_blank'>index</a>"
+                }
+                manifest.innerHTML += "<tr>" +
+                    "<td>"+entries[0]+"</td>" +
+                    "<td><a href='"+entries[3]+"' target='_blank'>"+entries[2]+"</a>"+indexFile+"</td>" +
+                    "<td>None</td>" +
+                    "</tr>"
+            }
+
+            result_container.appendChild(manifest)
 
         }
+
+
+
+
+
+
 
         show("input_container");
-
-        function RenderObj(obj){
-            let jv = new JSONViewer();
-            jv.render([obj], "result_container_json")
-            document.getElementById('result_container_json').scrollIntoView();
-        }
-
 
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);

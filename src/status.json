@@ -2710,5 +2710,222 @@
       ]
     },
     "error": []
+  },
+  "338621fa988f69726ee36a65644af53a": {
+    "id": "338621fa988f69726ee36a65644af53a",
+    "submission_original": {},
+    "submission_detail": {
+      "id": "338621fa988f69726ee36a65644af53a",
+      "file_mapping": {
+        "test.bed": "cb02601fea2651a65a4a765c53e51fc0"
+      },
+      "assembly": "hg19"
+    },
+    "finished": true,
+    "stat": {
+      "start time": 1672128139.5559082,
+      "end time": 1672128141.8335009,
+      "runtime": 2.277592658996582
+    },
+    "result": {
+      "gburl": "https://epigenomegateway.wustl.edu/browser/?genome=hg19&hub=https://localhost:10981//task/338621fa988f69726ee36a65644af53a/output//datahub.json",
+      "dhjson": "/task/338621fa988f69726ee36a65644af53a/output//datahub.json",
+      "file_mapping": [
+        [
+          "test.bed",
+          "bed",
+          "bed",
+          "./task/338621fa988f69726ee36a65644af53a/output/cb02601fea2651a65a4a765c53e51fc0.bed.gz"
+        ]
+      ]
+    },
+    "error": []
+  },
+  "b14840ed13cf7d4fb3373430ca4c1ccc": {
+    "id": "b14840ed13cf7d4fb3373430ca4c1ccc",
+    "submission_original": {},
+    "submission_detail": {
+      "id": "b14840ed13cf7d4fb3373430ca4c1ccc",
+      "file_mapping": {
+        "test.qbed": "648bd281ae18abe518837850195eb112"
+      },
+      "assembly": "hg19"
+    },
+    "finished": true,
+    "stat": {
+      "start time": 1672130756.697262,
+      "end time": 1672130756.95043,
+      "runtime": 0.25316786766052246
+    },
+    "result": {
+      "gburl": "https://epigenomegateway.wustl.edu/browser/?genome=hg19&hub=https://localhost:10981//task/b14840ed13cf7d4fb3373430ca4c1ccc/output//datahub.json",
+      "dhjson": "/task/b14840ed13cf7d4fb3373430ca4c1ccc/output//datahub.json",
+      "file_mapping": [
+        [
+          "test.qbed",
+          "qbed",
+          "qbed",
+          "./task/b14840ed13cf7d4fb3373430ca4c1ccc/output/648bd281ae18abe518837850195eb112.qbed.gz"
+        ]
+      ]
+    },
+    "error": []
+  },
+  "5621af4b36485a6b19b76bc30e4ebb0b": {
+    "id": "5621af4b36485a6b19b76bc30e4ebb0b",
+    "submission_original": {},
+    "submission_detail": {
+      "id": "5621af4b36485a6b19b76bc30e4ebb0b",
+      "file_mapping": {
+        "test.bed": "c8fd565cd9a477cfc8a8a594d0e03c78"
+      },
+      "assembly": "hg19"
+    },
+    "finished": true,
+    "stat": {
+      "start time": 1672130847.0719502,
+      "end time": 1672130849.259744,
+      "runtime": 2.187793731689453
+    },
+    "result": {
+      "gburl": "https://epigenomegateway.wustl.edu/browser/?genome=hg19&hub=https://localhost:10981//task/5621af4b36485a6b19b76bc30e4ebb0b/output//datahub.json",
+      "dhjson": "/task/5621af4b36485a6b19b76bc30e4ebb0b/output//datahub.json",
+      "file_mapping": [
+        [
+          "test.bed",
+          "bed",
+          "bed",
+          "./task/5621af4b36485a6b19b76bc30e4ebb0b/output/c8fd565cd9a477cfc8a8a594d0e03c78.bed.gz"
+        ]
+      ]
+    },
+    "error": []
+  },
+  "0795eef0387a8b5354e4ee8a0c09d913": {
+    "id": "0795eef0387a8b5354e4ee8a0c09d913",
+    "submission_original": {},
+    "submission_detail": {
+      "id": "0795eef0387a8b5354e4ee8a0c09d913",
+      "file_mapping": {
+        "test.qbed": "709449e2e78da81cfd35ee3de45e6d21"
+      },
+      "assembly": "hg19"
+    },
+    "finished": true,
+    "stat": {
+      "start time": 1672131014.747234,
+      "end time": 1672131015.001344,
+      "runtime": 0.25410985946655273
+    },
+    "result": {
+      "gburl": "https://epigenomegateway.wustl.edu/browser/?genome=hg19&hub=https://localhost:10981//task/0795eef0387a8b5354e4ee8a0c09d913/output//datahub.json",
+      "dhjson": "/task/0795eef0387a8b5354e4ee8a0c09d913/output//datahub.json",
+      "file_mapping": [
+        [
+          "test.qbed",
+          "qbed",
+          "qbed",
+          "./task/0795eef0387a8b5354e4ee8a0c09d913/output/709449e2e78da81cfd35ee3de45e6d21.qbed.gz"
+        ]
+      ]
+    },
+    "error": []
+  },
+  "d1cff61c223836261e8d6f226a30a94f": {
+    "id": "d1cff61c223836261e8d6f226a30a94f",
+    "submission_original": {},
+    "submission_detail": {
+      "id": "d1cff61c223836261e8d6f226a30a94f",
+      "file_mapping": {
+        "test.bed": "468da0430a21ece6603d31096fce2b69"
+      },
+      "assembly": "hg19"
+    },
+    "finished": true,
+    "stat": {
+      "start time": 1672131103.1636329,
+      "end time": 1672131105.3327749,
+      "runtime": 2.169142007827759
+    },
+    "result": {
+      "gburl": "https://epigenomegateway.wustl.edu/browser/?genome=hg19&hub=https://localhost:10981//task/d1cff61c223836261e8d6f226a30a94f/output//datahub.json",
+      "dhjson": "/task/d1cff61c223836261e8d6f226a30a94f/output//datahub.json",
+      "file_mapping": [
+        [
+          "test.bed",
+          "bed",
+          "bed",
+          "./task/d1cff61c223836261e8d6f226a30a94f/output/468da0430a21ece6603d31096fce2b69.bed.gz"
+        ]
+      ]
+    },
+    "error": []
+  },
+  "e69c64e5d0c43527d839476876fc7976": {
+    "id": "e69c64e5d0c43527d839476876fc7976",
+    "submission_original": {},
+    "submission_detail": {
+      "id": "e69c64e5d0c43527d839476876fc7976",
+      "file_mapping": {
+        "test.qbed": "c1771ee9fd33f41a9c1fd16f8f9f5a8d"
+      },
+      "assembly": "hg19"
+    },
+    "finished": true,
+    "stat": {
+      "start time": 1672131120.640034,
+      "end time": 1672131120.885917,
+      "runtime": 0.24588298797607422
+    },
+    "result": {
+      "gburl": "https://epigenomegateway.wustl.edu/browser/?genome=hg19&hub=https://localhost:10981//task/e69c64e5d0c43527d839476876fc7976/output//datahub.json",
+      "dhjson": "/task/e69c64e5d0c43527d839476876fc7976/output//datahub.json",
+      "file_mapping": [
+        [
+          "test.qbed",
+          "qbed",
+          "qbed",
+          "./task/e69c64e5d0c43527d839476876fc7976/output/c1771ee9fd33f41a9c1fd16f8f9f5a8d.qbed.gz"
+        ]
+      ]
+    },
+    "error": []
+  },
+  "dd567c1aa326a04118cc399152dbc70d": {
+    "id": "dd567c1aa326a04118cc399152dbc70d",
+    "submission_original": {},
+    "submission_detail": {
+      "id": "dd567c1aa326a04118cc399152dbc70d",
+      "file_mapping": {
+        "testx.bed": "7c82baab484481d547539e2f0d16f585",
+        "testz.qbed": "00e2c031406a4fd049d9f256a5ce5e08"
+      },
+      "assembly": "mm10"
+    },
+    "finished": true,
+    "stat": {
+      "start time": 1672132387.562324,
+      "end time": 1672132389.92877,
+      "runtime": 2.366446018218994
+    },
+    "result": {
+      "gburl": "https://epigenomegateway.wustl.edu/browser/?genome=mm10&hub=https://localhost:10981//task/dd567c1aa326a04118cc399152dbc70d/output//datahub.json",
+      "dhjson": "/task/dd567c1aa326a04118cc399152dbc70d/output//datahub.json",
+      "file_mapping": [
+        [
+          "testx.bed",
+          "bed",
+          "bed",
+          "./task/dd567c1aa326a04118cc399152dbc70d/output/7c82baab484481d547539e2f0d16f585.bed.gz"
+        ],
+        [
+          "testz.qbed",
+          "qbed",
+          "qbed",
+          "./task/dd567c1aa326a04118cc399152dbc70d/output/00e2c031406a4fd049d9f256a5ce5e08.qbed.gz"
+        ]
+      ]
+    },
+    "error": []
   }
 }
