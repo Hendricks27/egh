@@ -4,6 +4,7 @@ import sys
 import time
 import json
 import shutil
+import platform
 import multiprocessing
 from APIFramework import APIFramework, APIFrameworkWithFrontEnd, queue
 
@@ -125,6 +126,11 @@ class Final(APIFrameworkWithFrontEnd):
             # "": "",
         }
 
+        bin_folder = "./bin/linux/"
+        if platform.processor() == "arm":
+            bin_folder = "./bin/macarm/"
+
+
         # print("\n\n%s\n\n" % assembly)
         chrom_size = f"http://hgdownload.soe.ucsc.edu/goldenPath/{assembly}/bigZips/{assembly}.chrom.sizes"
         chrom_size = f"./chrom.sizes/{assembly}.chrom.sizes"
@@ -186,7 +192,7 @@ class Final(APIFrameworkWithFrontEnd):
 
         elif res["original_type"] in ["bg", "bedgraph"]:
             cmd1 = "sort -k1,1 -k2,2n %s > %s.bedgraph" % (input_path, output_path)
-            cmd2 = "./bin/bedGraphToBigWig %s.bedgraph %s %s.bigwig" % (output_path, chrom_size, output_path)
+            cmd2 = "%s/bedGraphToBigWig %s.bedgraph %s %s.bigwig" % (bin_folder, output_path, chrom_size, output_path)
 
             res["converted_type"] = "bigwig"
             res["converted_path"] += ".bigwig"
@@ -314,7 +320,7 @@ if __name__ == '__main__':
     multiprocessing.freeze_support()
 
     browserhelper_app = Final()
-    browserhelper_app.find_config("browserhelper.ini")
+    browserhelper_app.find_config("browserhelper_local.ini")
     browserhelper_app.start()
 
 

@@ -426,12 +426,15 @@ class APIFramework(object):
         # flask_cors.CORS(flask_app)
         # flask_app.config['CORS_HEADERS'] = 'Content-Type'
 
-        flask_app.run(self.host(), self.port(), False, ssl_context='adhoc')
+        if False:
+            flask_app.run(self.host(), self.port(), False, ssl_context='adhoc')
+        else:
+            flask_app.run(self.host(), self.port(), False)
 
 
     # FLASK related functions starts here
 
-    # FLASK handlers, need to be overwrite for your own app
+    # FLASK handlers, need to be overwritten for your own app
     def home(self, **kwargs):
         if self._home_html is None:
             return flask.jsonify("Hello from %s:%s" % (self.host(), self.port()))
