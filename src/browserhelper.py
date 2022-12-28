@@ -4,8 +4,6 @@ import sys
 import time
 import json
 import shutil
-import random
-import string
 import multiprocessing
 from APIFramework import APIFramework, APIFrameworkWithFrontEnd, queue
 
@@ -19,10 +17,15 @@ class Final(APIFrameworkWithFrontEnd):
     # Status queue
     # Multiple OS support (Mostly binaries? How)
     # Already processed files (bigwig, bigbed, hic, mcool, .... )
+    # Error handling
 
     # TODO list (Front End)
-    # Status queue
-    # New result page (Manifest, status, URL embeded parameters)
+    # Progress bar
+    # Prettier result page with errors
+    # Loading circle during upload
+
+
+    # TODO COV file index issue
 
 
     _allowed_genome = [
@@ -113,7 +116,7 @@ class Final(APIFrameworkWithFrontEnd):
                 break
         return res
 
-    def file_check_and_process(self, input_path, original_file_name=None, assembly="hg38"):
+    def file_check_and_process(self, input_path, original_file_name=None, assembly="hg38", pre_defined_file_format=None):
         res = {
             "original_type": "",
             "converted_type": "",
@@ -126,17 +129,25 @@ class Final(APIFrameworkWithFrontEnd):
         chrom_size = f"http://hgdownload.soe.ucsc.edu/goldenPath/{assembly}/bigZips/{assembly}.chrom.sizes"
         chrom_size = f"./chrom.sizes/{assembly}.chrom.sizes"
 
-        file_extension = None
-        if original_file_name != None and len(original_file_name.split(".")) > 0:
-            file_extension = original_file_name.split(".")[-1].lower()
-            if file_extension in ["bedgraph", "qbed", "qbed", "ccf", "bg"]:
-                res["original_type"] = file_extension
+        # File Format Determined By User
+        if pre_defined_file_format:
+            res["original_type"] = pre_defined_file_format
 
-        if res["original_type"] == "":
-            # Get file type
-            res["original_type"] = self.get_file_type(input_path)
-            if res["original_type"] == None:
-                res["error"].append("Cannot determine file type")
+        # Automatic
+        else:
+            # Try to determine file format by file extension
+            file_extension = None
+            if original_file_name != None and len(original_file_name.split(".")) > 0:
+                file_extension = original_file_name.split(".")[-1].lower()
+                if file_extension in ["bedgraph", "qbed", "qbed", "ccf", "bg"]:
+                    res["original_type"] = file_extension
+
+            # Try to determine file format by file content
+            if res["original_type"] == "":
+                # Get file type
+                res["original_type"] = self.get_file_type(input_path)
+                if res["original_type"] == None:
+                    res["error"].append("Cannot determine file type")
 
 
         output_path = input_path.replace("input", "output")
@@ -216,6 +227,7 @@ class Final(APIFrameworkWithFrontEnd):
             assembly = task_detail["assembly"]
             if assembly not in self._allowed_genome:
                 error.append("Genome Assembly (%s) is not supported" % assembly)
+            pre_defined_file_formats = task_detail["pre_defined_file_format"]
 
             working_dir = "./task/" + list_id + "/"
             working_dir_input = "./task/" + list_id + "/input/"
@@ -228,10 +240,18 @@ class Final(APIFrameworkWithFrontEnd):
                 hash_file_name = task_detail["file_mapping"][original_file_name]
 
                 input_file = working_dir_input + hash_file_name
+
+                pre_defined_file_format = None
+                if original_file_name in pre_defined_file_formats:
+                    if pre_defined_file_formats[original_file_name] != "auto":
+                        pre_defined_file_format = pre_defined_file_formats[original_file_name]
+
                 converting_process = self.file_check_and_process(
                     input_file,
                     original_file_name=original_file_name,
                     assembly=assembly,
+                    pre_defined_file_format=pre_defined_file_format
+
                 )
 
                 original_type = converting_process["original_type"]

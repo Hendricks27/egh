@@ -5,6 +5,22 @@
     <title>WashU Browser Helper</title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="/renderer.js"></script>
+    <style>
+        table {
+            width: 100%;
+            align-content: center;
+            text-align: center;
+        }
+
+        td {
+            text-align: center;
+            align-content: center;
+        }
+
+        tr {
+            align-content: center;
+        }
+    </style>
 </head>
 
 
@@ -60,7 +76,8 @@
                     <option value="ce11">ce11</option>
                     <option value="sacCer3">sacCer3</option>
                 </select> <br>
-                <input id="file" type="file" name="file" multiple><br><br>
+                <input id="file" type="file" name="file" multiple onchange="fileOption()"><br><br>
+                <div id="fileFormats"></div>
             </form>
             <button onclick="submitForm()">Submit</button>
 
@@ -105,6 +122,62 @@
 
         let retrieve_counter = 0;
         let retrieve_interval = 1000;
+
+
+        function fileOption(){
+
+            let fileInput = document.getElementById("file");
+            let fileList = fileInput.files;
+
+            let fileFormatContainer = document.getElementById("fileFormats");
+            fileFormatContainer.innerHTML = "";
+
+            let fileFormatTable = document.createElement("table");
+
+            if (fileList.length >0 ){
+                fileFormatTable.innerHTML += "<tr><th>File Name</th><th>File Size</th><th>File Type</th></tr>"
+            }
+
+            for (let file0 of fileList){
+                console.log(file0);
+
+                let fileSizeUnitString = ["", "kb", "mb", "gb"];
+
+                let fileSizeNum = file0.size;
+                let fileSizeUnitIndex = 0;
+
+                while (fileSizeNum > 1024) {
+                    fileSizeNum = fileSizeNum / 1024;
+                    fileSizeUnitIndex += 1
+                }
+
+                let fileSizeString = parseInt(fileSizeNum).toString() + " " + fileSizeUnitString[fileSizeUnitIndex];
+                let fileSizeEle = "<span></span>";
+
+
+                fileSizeEle = "<span>"+fileSizeString+"</span>"
+                // 200M file size limit
+                if (file0.size > 1024*1024*500) {
+                    fileSizeEle = "<span style='color: red'>"+fileSizeString+" (Too Large)</span>"
+                }
+
+                let fileFormatSelector = '<select name="'+file0.name+'">' +
+                    '<option value="auto">Auto</option>' +
+                    '<option value="bed">bed</option>' +
+                    '<option value="qbed">qbed</option>' +
+                    '<option value="bedgraph">bedgraph</option>' +
+                    '<option value="cov">cov</option>' +
+                    '<option value="processed">Processed</option>' +
+                    '</select>';
+                // '<option value=""></option>' +
+
+
+                fileFormatTable.innerHTML += "<tr><td>"+file0.name+"</td><td>"+fileSizeEle.toString()+"</td><td>"+fileFormatSelector+"</td></tr>"
+            }
+
+            fileFormatContainer.appendChild(fileFormatTable)
+
+        }
 
         function submitForm(){
 

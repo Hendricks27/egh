@@ -643,11 +643,22 @@ class APIFramework(object):
 
             task_id = self.random_hash()
 
+            p = self.api_para()
+            print(p)
+
+            assembly = "hg38"
+            if "assembly" in p:
+                assembly = p["assembly"]
+            pre_defined_file_format = {}
+
 
             file_name_mapping = {}
             for file in files:
                 filename = werkzeug.utils.secure_filename(file.filename)
                 hashfilename = self.str2hash(''.join(random.choices(string.ascii_uppercase + string.digits, k=1000)).encode("utf-8"))
+
+                if filename in p:
+                    pre_defined_file_format[filename] = p[filename]
 
                 file_name_mapping[filename] = hashfilename
 
@@ -661,15 +672,12 @@ class APIFramework(object):
                     response = flask.jsonify('No selected file')
                     return response
 
-            p = self.api_para()
-            assembly = "hg38"
-            if "assembly" in p:
-                assembly = p["assembly"]
 
             task_detail = {
                 "id": task_id,
                 "file_mapping": file_name_mapping,
-                "assembly": assembly
+                "assembly": assembly,
+                "pre_defined_file_format": pre_defined_file_format,
             }
 
             status = {
