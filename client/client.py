@@ -8,8 +8,8 @@ import requests
 
 class BrowserHelperClient(object):
     _base_url_protocol = "https"
-    _base_url_host = "10.20.127.22"
-    _base_url_port = 10981
+    _base_url_host = "companion.epigenomegateway.org"
+    _base_url_port = 22
     _base_url = ""
 
     def __init__(self):

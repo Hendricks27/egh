@@ -19,6 +19,7 @@ class Final(APIFrameworkWithFrontEnd):
     # Multiple OS support (Mostly binaries? How)
     # Already processed files (bigwig, bigbed, hic, mcool, .... )
     # Error handling
+    # AWS / GCP / Azure
 
     # TODO list (Front End)
     # Progress bar
@@ -320,7 +321,7 @@ if __name__ == '__main__':
     multiprocessing.freeze_support()
 
     browserhelper_app = Final()
-    browserhelper_app.find_config("browserhelper_local.ini")
+    browserhelper_app.find_config("browserhelper_aws.ini")
     browserhelper_app.start()
 
 

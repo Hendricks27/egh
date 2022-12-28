@@ -1,11 +1,16 @@
 #!/bin/bash
 
-tag="V1.1.1"
+tag="V0.1.1"
 
-docker build -t wenjin27/visfinal:$tag -t wenjin27/visfinal:latest ./
+docker build --platform linux/amd64 -t wenjin27/egh:$tag -t wenjin27/egh:latest  ./
 
-#docker push wenjin27/visfinal:$tag
-#docker push wenjin27/visfinal:latest
+docker tag wenjin27/egh:latest 174329956306.dkr.ecr.us-east-1.amazonaws.com/egh:latest
+docker tag wenjin27/egh:latest 174329956306.dkr.ecr.us-east-1.amazonaws.com/egh:$tag
 
-# docker run -p 10981:10981 wenjin27/visfinal
+docker push 174329956306.dkr.ecr.us-east-1.amazonaws.com/egh:latest
+docker push 174329956306.dkr.ecr.us-east-1.amazonaws.com/egh:$tag
+#docker push wenjin27/egh:$tag
+#docker push wenjin27/egh:latest
+
+# docker run -p 10981:10981 wenjin27/egh
 

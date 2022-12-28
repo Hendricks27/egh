@@ -1,8 +1,8 @@
 #!/bin/bash
 
 apt update
+apt-get install -y libncurses-dev libbz2-dev liblzma-dev tabix
 apt install chromium-chromedriver
-apt-get install tabix
 
 chmod -R 0777 ./
 mkdir /data

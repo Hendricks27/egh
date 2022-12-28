@@ -262,5 +262,38 @@
       ]
     },
     "error": []
+  },
+  "630ee604e0f8374c2b1656bd7f0e23a8": {
+    "id": "630ee604e0f8374c2b1656bd7f0e23a8",
+    "submission_original": {},
+    "submission_detail": {
+      "id": "630ee604e0f8374c2b1656bd7f0e23a8",
+      "file_mapping": {
+        "test.bed": "6151d34d5c65a1bb53e5c16e62ed8e1f"
+      },
+      "assembly": "hg38",
+      "pre_defined_file_format": {
+        "test.bed": "auto"
+      }
+    },
+    "finished": true,
+    "stat": {
+      "start time": 1672217483.634165,
+      "end time": 1672217485.973788,
+      "runtime": 2.339622974395752
+    },
+    "result": {
+      "gburl": "https://epigenomegateway.wustl.edu/browser/?genome=hg38&hub=http://localhost:10981//task/630ee604e0f8374c2b1656bd7f0e23a8/output//datahub.json",
+      "dhjson": "/task/630ee604e0f8374c2b1656bd7f0e23a8/output//datahub.json",
+      "file_mapping": [
+        [
+          "test.bed",
+          "bed",
+          "bed",
+          "./task/630ee604e0f8374c2b1656bd7f0e23a8/output/6151d34d5c65a1bb53e5c16e62ed8e1f.bed.gz"
+        ]
+      ]
+    },
+    "error": []
   }
 }
