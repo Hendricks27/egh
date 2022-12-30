@@ -11,12 +11,14 @@ class BrowserHelperClient(object):
     _base_url_host = "companion.epigenomegateway.org"
     _base_url_port = 22
     _base_url = ""
+    _request_verify = True
 
     def __init__(self):
         self._base_url = self.make_url()
 
     def update_url(self):
         self._base_url = self.make_url()
+        self._request_verify = self._base_url_host == "companion.epigenomegateway.org"
 
     def make_url(self):
         port = ":%s" % self._base_url_port
@@ -46,7 +48,7 @@ class BrowserHelperClient(object):
 
         surl = self._base_url + "/file_upload"
 
-        response = requests.post(surl, files=files, data={"assembly": assembly}, verify=False)
+        response = requests.post(surl, files=files, data={"assembly": assembly}, verify=self._request_verify)
 
         assert response.status_code == 200
         task_id = response.text
@@ -54,7 +56,7 @@ class BrowserHelperClient(object):
 
     def retrieve_simple(self, task_id):
         surl = self._base_url + "/retrieve?list_id=" + task_id
-        response = requests.get(surl, verify=False)
+        response = requests.get(surl, verify=self._request_verify)
         res = json.loads(response.text)[0]
         # print(res)
         return res
