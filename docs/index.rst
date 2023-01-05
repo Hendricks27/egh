@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Washu Epigenome Browser Helper's documentation!
+Welcome to Documentation For Genome Browser Companion !
 ==========================================================
 
 .. toctree::
@@ -17,11 +17,3 @@ Welcome to Washu Epigenome Browser Helper's documentation!
    faq
    contact
 
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`search`
