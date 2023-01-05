@@ -1,0 +1,14 @@
+FROM python:3.7
+
+ADD . /code
+
+EXPOSE 80
+EXPOSE 443
+
+WORKDIR /code
+
+
+RUN pip install -r requirement.txt
+RUN ./environment.sh
+
+CMD python browserhelper_local.py

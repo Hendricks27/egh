@@ -115,20 +115,25 @@ class APIFramework(object):
         self._app_name = "testing"
         # self._flask_app = flask.Flask(self._app_name)
 
-        self._input_file_folder  = self.autopath("input")
+        self._input_file_folder = self.autopath("input")
         # self._output_file_folder = self.abspath("output")
 
         self._allowed_file_ext = ["txt", "doc", "docx", "pdf", "jpg", "png", "csv", "tsv", "bed", "qbed", "bedgraph", "bg"]
         self._allow_cors = True
+        self._adhoc_cert = False
+
+        self._expiration_period = False
 
         self._worker_para = {}
 
         self.result_cache = {}
         self.task_queue   = multiprocessing.Queue()
+        self.status_queue = multiprocessing.Queue()
         self.result_queue = multiprocessing.Queue()
         self.flask_queue  = multiprocessing.Queue()
         self.request_suicide_queue = multiprocessing.Queue()
         self.approve_suicide_queue = multiprocessing.Queue()
+
 
         self._static_folder = None
         self._static_url = None
@@ -191,6 +196,27 @@ class APIFramework(object):
 
     def set_input_file_folder(self, fp):
         self._input_file_folder = self.autopath(fp)
+
+    def set_expiration_period(self, s):
+        res = 0
+        s = s.lower()
+        try:
+            res = float(s)
+        except:
+            res = 0
+            v = float(s[:-1])
+            unit = s[-1]
+            if unit == "s":
+                res = v
+            elif unit == "m":
+                res = v * 60
+            elif unit == "h":
+                res = v * 60 * 60
+            elif unit == "d":
+                res = v * 60 * 60 * 24
+
+        self._expiration_period = res
+
 
     # set_status_saving_location
 
@@ -352,6 +378,12 @@ class APIFramework(object):
             if "allow_cors" in res["basic"]:
                 self._allow_cors = self.bool(res["basic"]["allow_cors"])
 
+            if "adhoc_cert" in res["basic"]:
+                self._adhoc_cert = self.bool(res["basic"]["adhoc_cert"])
+
+            if "expiration_period" in res["basic"]:
+                self.set_expiration_period(res["basic"]["expiration_period"])
+
             if "google_analytics_tag_id" in res["basic"]:
                 self.set_google_analytics_tag_id(res["basic"]["google_analytics_tag_id"])
 
@@ -394,11 +426,11 @@ class APIFramework(object):
 
 
     # Worker function
-    def worker(pid, task_queue, result_queue, params):
+    def worker(self, pid, task_queue, status_queue, result_queue, params):
         # Params are key value pairs from configuration file, section app_name
         raise NotImplemented
 
-    def flask_start(self, pid, task_queue, result_queue, params):
+    def flask_start(self, pid, task_queue, status_queue, result_queue, params):
         self.output(1, "FLASK service started at %s:%s" % (self.host(), self.port()) )
 
         if self._template_folder is None:
@@ -426,11 +458,11 @@ class APIFramework(object):
         # flask_cors.CORS(flask_app)
         # flask_app.config['CORS_HEADERS'] = 'Content-Type'
 
-        if False:
-            flask_app.run(self.host(), self.port(), False, ssl_context='adhoc')
-        else:
-            flask_app.run(self.host(), self.port(), False)
-
+        # ssl_context = "adhoc"
+        kwarg = {}
+        if self._adhoc_cert:
+            kwarg["ssl_context"] = "adhoc"
+        flask_app.run(self.host(), self.port(), False, **kwarg)
 
     # FLASK related functions starts here
 
@@ -689,6 +721,7 @@ class APIFramework(object):
                 "submission_detail": task_detail,
                 "finished": False,
                 "stat": {},
+                "status": {"started": False},
                 "result": {}
             }
 
@@ -774,7 +807,7 @@ class APIFramework(object):
         except queue.Empty:
             pass
 
-    def update_results(self, getall=False):
+    def update_results(self, getall=True):
 
         dump = False
         i = 0
@@ -802,9 +835,45 @@ class APIFramework(object):
             except KeyError:
                 self.output(1, "Job ID %s is not present" % res["id"])
 
+        while True:
+            try:
+                status = self.status_queue.get_nowait()
+                task_id = status["id"]
+                del status["id"]
+                self.result_cache[task_id]["status"] = status
+
+                dump = True
+            except queue.Empty:
+                break
+
+
         if dump:
             self.dump_status()
 
+        if isinstance(self._expiration_period, int):
+            if self._expiration_period > 0:
+                self.delete_outdated_files()
+
+    def delete_outdated_files(self):
+        # print("Deleting Check")
+        for task_id in list(self.result_cache.keys()):
+            detail = self.result_cache[task_id]
+            if "stat" in detail:
+                stat = detail["stat"]
+                if "start time" in stat:
+                    start_ts = stat["start time"]
+                    passed = time.time() - start_ts
+
+                    if passed > self._expiration_period:
+                        message = "Task(%s) was created at %0.1fs, %0.1fs has paseed since then, deleted because of task expires after %0.1fs" % (task_id, start_ts, passed, self._expiration_period)
+                        self.output(0, message)
+
+                        del self.result_cache[task_id]
+                        try:
+                            shutil.rmtree("./task/%s" % task_id, )
+                        except:
+                            pass
+        return
 
     def allow_file_ext(self, filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in self.allowed_file_ext()
@@ -881,7 +950,7 @@ class APIFramework(object):
         for k,v in self._worker_para.items():
             self.output(0, "%s(worker para): %s" % (k,v))
 
-        flask_process = multiprocessing.Process(target=self.flask_start, args=(0, self.task_queue, self.result_queue, self._worker_para))
+        flask_process = multiprocessing.Process(target=self.flask_start, args=(0, self.task_queue, self.status_queue, self.result_queue, self._worker_para))
         flask_process.start()
 
         self._worker_started = True
@@ -922,10 +991,11 @@ class APIFramework(object):
             self.request_suicide_queue,
             self.approve_suicide_queue
         ]
+        suicide_queue = []
 
         proc = multiprocessing.Process(
             target=self.worker,
-            args=(pid, self.task_queue, self.result_queue, suicide_queue, self._worker_para)
+            args=(pid, self.task_queue, self.status_queue, self.result_queue, suicide_queue, self._worker_para)
         )
 
         proc.start()
@@ -974,17 +1044,15 @@ class APIFramework(object):
         self.cleanup()
 
         while True:
-            time.sleep(60)
+            time.sleep(10)
 
             unfinished_job_count = self.task_queue.qsize()
 
             self.deamon_process_pool_update()
 
             require_new_worker = False
-            if unfinished_job_count > 10:
+            if len(self._deamon_process_pool) < self.max_worker_num():
                 require_new_worker = True
-            if len(self._deamon_process_pool) >= self.max_worker_num():
-                require_new_worker = False
 
             if require_new_worker:
 
@@ -992,26 +1060,6 @@ class APIFramework(object):
                 new_pid, new_proc = self.new_worker_process()
                 self._deamon_process_pool[new_pid] = new_proc
 
-            if unfinished_job_count >= len(self._deamon_process_pool):
-                while True:
-                    try:
-                        pid = self.request_suicide_queue.get_nowait()
-                    except queue.Empty:
-                        break
-                continue
-
-            try:
-                pid = self.request_suicide_queue.get_nowait()
-
-                self.deamon_process_pool_update()
-
-                if len(self._deamon_process_pool) > 1:
-                    self.approve_suicide_queue.put(True)
-                    self.output(0, "Sending KILL-SIGNAL to worker")
-                self.deamon_process_pool_update()
-
-            except queue.Empty:
-                pass
 
 
     def cleanup(self):
@@ -1072,6 +1120,10 @@ class APIFrameworkWithFrontEnd(APIFramework):
         @app.route('/renderer.js', methods=["GET", "POST"])
         def renderer():
             return open("./htmls/renderer.js").read()
+
+        @app.route('/loader.gif', methods=["GET", "POST"])
+        def loaderimgxxfjkslafjlka():
+            return flask.send_file("./htmls/loader.gif")
 
         @app.route('/task/<path:path>',
                    methods=['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'],

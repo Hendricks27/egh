@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WashU Browser Helper</title>
+    <title>Genome Browser Companion</title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="/renderer.js"></script>
     <style>
@@ -79,7 +79,7 @@
                 <input id="file" type="file" name="file" multiple onchange="fileOption()"><br><br>
                 <div id="fileFormats"></div>
             </form>
-            <button onclick="submitForm()">Submit</button>
+            <button id="submit_button" onclick="submitForm()">Submit</button><span id="uploading_circle"></span>
 
             <br><br><br><br><br><br>
 
@@ -141,7 +141,7 @@
             for (let file0 of fileList){
                 console.log(file0);
 
-                let fileSizeUnitString = ["", "kb", "mb", "gb"];
+                let fileSizeUnitString = ["byte", "kb", "mb", "gb"];
 
                 let fileSizeNum = file0.size;
                 let fileSizeUnitIndex = 0;
@@ -161,13 +161,25 @@
                     fileSizeEle = "<span style='color: red'>"+fileSizeString+" (Too Large)</span>"
                 }
 
+                /*
+                "bed", "qbed", "cov", "methylc", "categorical", "refbed", "longrange"
+                "wig", "bedgraph"
+                "bigWig", "bigbed", "hic"
+                */
                 let fileFormatSelector = '<select name="'+file0.name+'">' +
                     '<option value="auto">Auto</option>' +
                     '<option value="bed">bed</option>' +
                     '<option value="qbed">qbed</option>' +
-                    '<option value="bedgraph">bedgraph</option>' +
                     '<option value="cov">cov</option>' +
-                    '<option value="processed">Processed</option>' +
+                    '<option value="methylc">methylc</option>' +
+                    '<option value="categorical">categorical</option>' +
+                    '<option value="refbed">refbed</option>' +
+                    '<option value="longrange">longrange</option>' +
+                    '<option value="bedgraph">bedgraph</option>' +
+                    '<option value="wig">wig</option>' +
+                    '<option value="bigwig">bigwig</option>' +
+                    '<option value="bigbed">bigbed</option>' +
+                    '<option value="hic">hic</option>' +
                     '</select>';
                 // '<option value=""></option>' +
 
@@ -182,6 +194,12 @@
         function submitForm(){
 
             let myForm = new FormData(document.getElementById("form123"));
+            let loadingCircleContainer = document.getElementById("uploading_circle");
+            loadingCircleContainer.innerHTML = "";
+            loadingCircleContainer.innerHTML = "<img src='./loader.gif' style='width: 20px; height: 20px'>"
+
+            let submitbutton = document.getElementById("submit_button");
+            submitbutton.disabled = true;
 
             fetch("./file_upload", {
                 method: 'POST',
@@ -201,7 +219,7 @@
         function show(index){
             for (let eleid of ["input_container", "loading_container", "result_container", ]){
                 let ele = document.getElementById(eleid);
-                if (index == eleid){
+                if (index === eleid){
                     ele.style.display = "";
                 }
                 else {
@@ -224,18 +242,29 @@
             retrieve_counter += 1;
             jQuery.post("./retrieve", {"task_id": task_id}).then(function (d){
                 console.log(d)
-                if (retrieve_counter > 5){
+                if (retrieve_counter > 100){
                     retrieve_interval = 3000
                 }
-                else if (retrieve_counter > 10) {
-                    retrieve_interval = 5000;
-                }
 
+                let status = d[0].status;
+                //console.log(status)
+
+                document.getElementById("loading").innerHTML = "";
                 let dotnum = retrieve_counter % 3 + 1;
                 let dotstr = ".".repeat(dotnum);
-                document.getElementById("submit_status").innerHTML = "<br><br><br>Converting" + dotstr;
-                document.getElementById("loading").innerHTML = "The page refreshes every " + parseInt(retrieve_interval/1000) + "s.<br>" +
-                                "Please wait.";
+                if (status.started){
+                    let workingstr = "Working on "+status.working+"<br>"+status.finishedcount+"/"+status.totalcount+" completed";
+                    document.getElementById("submit_status").innerHTML = "<br><br><br>" + workingstr;
+                } else {
+
+                    document.getElementById("submit_status").innerHTML = "<br><br><br>Waiting in queue" ;
+                }
+
+                document.getElementById("loading").innerHTML += "The page refreshes every " + parseInt(retrieve_interval/1000) + "s.<br>" +
+                                    "Please wait"+ dotstr;
+
+
+
 
 
                 if (!d[0].finished){
@@ -267,12 +296,13 @@
 
             let gburl = result.gburl;
             let dhjson = result.dhjson;
+            let allzip = result.allzip;
 
             let fileMapping = result.file_mapping;
 
             console.log(fileMapping)
 
-            result_container.innerHTML += "<a href='"+gburl+"' target='_blank'>WashU Epigenome Browser</a>"
+            result_container.innerHTML += "<span>View Your Files @&nbsp</span><a href='"+gburl+"' target='_blank'>WashU Epigenome Browser</a>"
             result_container.innerHTML += "<br><br><br>"
 
             result_container.innerHTML += "<h3>Manifest</h3>"
@@ -284,26 +314,33 @@
                 "    <th>Converted File</th>\n" +
                 "    <th>Error</th>\n" +
                 "  </tr>" +
-                "<tr><td>Datahub</td><td><a href='"+dhjson+"' target='_blank'>Datahub</a></td><td>None</td></tr>"
+                "<tr><td>Datahub</td><td><a href='"+dhjson+"' target='_blank'>Datahub</a></td><td> - </td></tr>"+
+                "<tr><td>All.zip</td><td><a href='"+allzip+"' target='_blank'>All.zip</a></td><td> - </td></tr>"+
+                "<tr><td></td><td> - </td><td></td></tr>"
 
             for (let entries of fileMapping){
                 let indexFile = ""
                 if (["qbed", "bed"].includes(entries[2])){
                     indexFile = "&nbsp<a href='"+entries[3]+".tbi' target='_blank'>index</a>"
                 }
+                let error = "None";
+                if (entries[4].length > 0){
+                    error = "";
+                    for (let e of entries[4]){
+                        error += e
+                        error += "<br>"
+                    }
+                }
                 manifest.innerHTML += "<tr>" +
                     "<td>"+entries[0]+"</td>" +
                     "<td><a href='"+entries[3]+"' target='_blank'>"+entries[2]+"</a>"+indexFile+"</td>" +
-                    "<td>None</td>" +
+                    "<td>"+error+"</td>" +
                     "</tr>"
             }
 
             result_container.appendChild(manifest)
 
         }
-
-
-
 
 
 
@@ -316,6 +353,7 @@
 
         if (tmp_task_id !== null && tmp_task_id !== task_id) {
             task_id = tmp_task_id;
+            show("loading_container");
             retrieve();
         }
 
