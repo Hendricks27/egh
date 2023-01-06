@@ -21,7 +21,6 @@ class EGH(APIFrameworkWithFrontEnd):
     # Ensemble / UCSC Genome Browser Support
 
     # TODO list (Front End)
-    # Progress bar
     # Prettier result page
 
     _allowed_genome = [
@@ -427,6 +426,7 @@ class EGH(APIFrameworkWithFrontEnd):
 
             self.output(2, "Worker-%s finished computing job (%s)" % (pid, task_id))
 
+            time.sleep(10)
             res = {
                 "id": task_id,
                 "start time": calculation_start_time,

@@ -900,6 +900,7 @@ class APIFramework(object):
         def cors(response):
             # http://epigenomegateway.wustl.edu
             response.headers.add('Access-Control-Allow-Origin', '*')
+            response.headers.add('Access-Control-Allow-Headers', '*')
             response.headers.add('Access-Control-Allow-Private-Network', "true")
             response.headers.add('Vary', "*")
 

@@ -1,9 +1,8 @@
-# Washu Epigenome Browser Helper
+# Genome Browser Companion
 
+[Documentation](https://gbc.readthedocs.io/en/latest/)
 
-
-[[Documentation]](https://washu-epigenome-browser-helper.readthedocs.io/en/latest/index.html)
-
+[Public Version](https://companion.epigenomegateway.org/)
 
 
 

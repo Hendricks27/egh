@@ -20,6 +20,28 @@
         tr {
             align-content: center;
         }
+
+        #statusBarContainer {
+            align-content: center;
+            width: 100%;
+        }
+
+        #myProgress {
+            border-radius: 15px;
+            margin-left: 15%;
+            width: 70%;
+            background-color: lightgrey;
+        }
+
+        #myBar {
+            width: 1%;
+            border-radius: 15px;
+            height: 50px;
+            background-color: #eb348f;
+            color: white;
+            padding-top: 15px;
+        }
+
     </style>
 </head>
 
@@ -88,6 +110,7 @@
         <div id="loading_container" style="width: 70%; height: 100%; margin: auto; text-align: center">
             <p id="submit_status" style="font-size: 25px;"></p>
             <p id="loading"></p>
+            <p id="tips"></p>
         </div>
 
         <br><br><br>
@@ -122,6 +145,13 @@
 
         let retrieve_counter = 0;
         let retrieve_interval = 1000;
+
+
+        let tips = [
+            "You can bookmark this page, and come back later.",
+            "The public version only keeps the track for 24 hours. ",
+            "You can also host your own service.",
+        ]
 
 
         function fileOption(){
@@ -255,13 +285,24 @@
                 if (status.started){
                     let workingstr = "Working on "+status.working+"<br>"+status.finishedcount+"/"+status.totalcount+" completed";
                     document.getElementById("submit_status").innerHTML = "<br><br><br>" + workingstr;
-                } else {
 
+                    let percentageFinished = status.finishedcount / status.totalcount * 100;
+                    document.getElementById("submit_status").innerHTML += "<br><br><div id='statusBarContainer'><div id='myProgress'><div id='myBar'>"+Math.round(percentageFinished)+"%</div></div></div>"
+
+                    document.getElementById("myBar").style.width = percentageFinished.toString() + "%"
+
+                } else {
                     document.getElementById("submit_status").innerHTML = "<br><br><br>Waiting in queue" ;
                 }
 
                 document.getElementById("loading").innerHTML += "The page refreshes every " + parseInt(retrieve_interval/1000) + "s.<br>" +
                                     "Please wait"+ dotstr;
+
+                let tipsnum = parseInt(retrieve_counter/10) % tips.length;
+                let thisTip = tips[tipsnum];
+
+                document.getElementById("tips").innerHTML = "<br><br><br><h3>Tips "+(tipsnum+1).toString()+":</h3>" + "" + thisTip;
+
 
 
 
