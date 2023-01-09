@@ -313,9 +313,6 @@ class EGH(APIFrameworkWithFrontEnd):
 
         self.output(2, "Worker-%s is ready to take job" % (pid))
 
-        import random
-        random.randint(1, 100)
-
         while True:
             task_detail = self.task_queue_get(task_queue, pid, suicide_queue_pair)
 
@@ -348,7 +345,6 @@ class EGH(APIFrameworkWithFrontEnd):
                 "finishedcount": 0,
             }
             status_queue.put(status)
-
 
 
             for original_file_name in task_detail["file_mapping"]:
@@ -405,7 +401,9 @@ class EGH(APIFrameworkWithFrontEnd):
             subp = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             cmd_out = subp.stdout.read().decode("utf-8")
             cmd_err = subp.stderr.read().decode("utf-8")
-
+            # print(cmd_out)
+            # print(cmd_err)
+            # print(os.listdir(f"./task/{task_id}/"))
 
             json.dump(datahub, open(datahub_file, "w"))
 
@@ -426,7 +424,6 @@ class EGH(APIFrameworkWithFrontEnd):
 
             self.output(2, "Worker-%s finished computing job (%s)" % (pid, task_id))
 
-            time.sleep(10)
             res = {
                 "id": task_id,
                 "start time": calculation_start_time,

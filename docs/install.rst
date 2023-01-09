@@ -34,9 +34,9 @@ And set 'Allow invalid certificates for resources loaded from localhost.' enable
 
 Edge
 ~~~~~~~~~~
-Open your browser chrome://flags/#allow-insecure-localhost
+Open your browser edge://flags/#allow-insecure-localhost, and do the same for chrome.
 
-Safari
+Safari & Firefox
 ~~~~~~~~~~
 No special tweaks required.
 

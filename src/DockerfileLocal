@@ -2,7 +2,6 @@ FROM python:3.7
 
 ADD . /code
 
-EXPOSE 80
 EXPOSE 443
 
 WORKDIR /code

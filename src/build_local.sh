@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tag="V0.1.5"
+tag="V0.1.7"
 
 # --platform linux/amd64
 # --platform linux/arm64/v8

@@ -2,9 +2,8 @@
 
 apt update
 apt-get install -y libncurses-dev libbz2-dev liblzma-dev tabix
-apt install chromium-chromedriver
-apt-get install zip unzip
-
+apt-get install zip
+apt-get install unzip
 
 chmod -R 0777 ./
 mkdir /data

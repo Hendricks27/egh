@@ -1,6 +1,6 @@
 #!/bin/bash
 
-tag="V0.1.5"
+tag="V0.1.7"
 
 docker build --platform linux/amd64 -t wenjin27/egh:$tag -t wenjin27/egh:latest  ./
 

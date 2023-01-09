@@ -9,7 +9,6 @@ import time
 import json
 import math
 import flask
-import flask_cors
 import werkzeug
 import atexit
 import hashlib

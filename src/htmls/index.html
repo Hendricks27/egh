@@ -26,21 +26,108 @@
             width: 100%;
         }
 
-        #myProgress {
-            border-radius: 15px;
-            margin-left: 15%;
-            width: 70%;
-            background-color: lightgrey;
-        }
-
         #myBar {
-            width: 1%;
+            width: 0;
             border-radius: 15px;
             height: 50px;
             background-color: #eb348f;
             color: white;
             padding-top: 15px;
+            text-align: end;
         }
+
+        @keyframes slide {
+            from {
+                background-position-x: 0;
+            }
+            to {
+                background-position-x: 5000px;
+            }
+        }
+
+
+        #myProgress {
+            margin-left: 15%;
+            width: 70%;
+            border-radius: 15px;
+            font-size: 25px;
+
+            box-shadow: 0 10px 13px -6px rgba(44, 62, 80, 1);
+            background-color: lightgrey;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent 0,
+                transparent 8%,
+                grey 8%,
+                grey 16%
+            );
+
+            animation: slide 100s linear infinite;
+            will-change: background-position;
+        }
+
+
+        .table1 {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .table1 caption {
+            font-size: 30px;
+        }
+
+        .table1 td, .table1 th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .table1 th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            background-color: #eb348f;
+            color: white;
+        }
+
+        .table1 tr:nth-child(even){
+            background-color: #f2f2f2;
+        }
+
+        .table1 tr:hover {
+            background-color: #ddd;
+        }
+
+        input::file-selector-button {
+            font-weight: bold;
+            color: #eb348f;
+            padding: 0.5em;
+            border: thin solid grey;
+            border-radius: 3px;
+        }
+
+
+        .button1 {
+            background-color: white;
+            border: 2px solid #eb348f;
+            color: #eb348f;
+            padding: 5px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 20px;
+            transition-duration: 0.4s;
+            border-radius: 5px;
+        }
+
+        .button1:hover {
+            background-color: #eb348f;
+            color: white;
+            box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+        }
+
+
+
 
     </style>
 </head>
@@ -52,8 +139,15 @@
     <div id="content" style="margin: 5px; padding-bottom: 0px; ">
         <div id="input_container" style="width: 70%; margin: auto">
             <p style="width: 100%; ">
-                This system is designed to help you relieve from file format converting<br>
-                And take you to the browser immediately<br>
+                This system is designed to assist you with file format conversion and provide quick access to WashU Epigenome Browser within just a few clicks.
+                <br><br>
+                Instructions:<br>
+                1. Select genome assembly;<br>
+                2. Choose your file;<br>
+                3. Click "Convert Now"<br>
+                <br>
+                Note:<br>
+                For the most accurate track type identification, please select the file type in the upcoming table.
             </p>
 
             <form method="post" enctype="multipart/form-data" id="form123">
@@ -101,7 +195,8 @@
                 <input id="file" type="file" name="file" multiple onchange="fileOption()"><br><br>
                 <div id="fileFormats"></div>
             </form>
-            <button id="submit_button" onclick="submitForm()">Submit</button><span id="uploading_circle"></span>
+            <br>
+            <button id="submit_button" onclick="submitForm()" class="button1">Convert Now</button><span id="uploading_circle"></span>
 
             <br><br><br><br><br><br>
 
@@ -109,6 +204,14 @@
         </div>
         <div id="loading_container" style="width: 70%; height: 100%; margin: auto; text-align: center">
             <p id="submit_status" style="font-size: 25px;"></p>
+            <span id="progressBar" >
+                <div id='statusBarContainer'>
+                    <div id='myProgress'>
+                        <div id='myBar'>0%</div>
+                    </div>
+                </div>
+
+            </span>
             <p id="loading"></p>
             <p id="tips"></p>
         </div>
@@ -151,6 +254,7 @@
             "You can bookmark this page, and come back later.",
             "The public version only keeps the track for 24 hours. ",
             "You can also host your own service.",
+            'It is best to name your files like "something.bed", "something.bedgraph", "something.categorical.bed", "something.methylc".'
         ]
 
 
@@ -163,9 +267,11 @@
             fileFormatContainer.innerHTML = "";
 
             let fileFormatTable = document.createElement("table");
+            fileFormatTable.className = "table1";
+            let fileFormatTableBody = document.createElement("tbody");
 
             if (fileList.length >0 ){
-                fileFormatTable.innerHTML += "<tr><th>File Name</th><th>File Size</th><th>File Type</th></tr>"
+                fileFormatTable.innerHTML += "<caption>Select File Type</caption><thead><tr><th>File Name</th><th>File Size</th><th>File Type</th></tr></thead>"
             }
 
             for (let file0 of fileList){
@@ -214,9 +320,10 @@
                 // '<option value=""></option>' +
 
 
-                fileFormatTable.innerHTML += "<tr><td>"+file0.name+"</td><td>"+fileSizeEle.toString()+"</td><td>"+fileFormatSelector+"</td></tr>"
+                fileFormatTableBody.innerHTML += "<tr><td>"+file0.name+"</td><td>"+fileSizeEle.toString()+"</td><td>"+fileFormatSelector+"</td></tr>"
             }
 
+            fileFormatTable.appendChild(fileFormatTableBody)
             fileFormatContainer.appendChild(fileFormatTable)
 
         }
@@ -229,6 +336,7 @@
             loadingCircleContainer.innerHTML = "<img src='./loader.gif' style='width: 20px; height: 20px'>"
 
             let submitbutton = document.getElementById("submit_button");
+            submitbutton.className = 'button1';
             submitbutton.disabled = true;
 
             fetch("./file_upload", {
@@ -287,9 +395,11 @@
                     document.getElementById("submit_status").innerHTML = "<br><br><br>" + workingstr;
 
                     let percentageFinished = status.finishedcount / status.totalcount * 100;
-                    document.getElementById("submit_status").innerHTML += "<br><br><div id='statusBarContainer'><div id='myProgress'><div id='myBar'>"+Math.round(percentageFinished)+"%</div></div></div>"
 
+                    // document.getElementById("submit_status").innerHTML += "<br><br><div id='statusBarContainer'><div id='myProgress'><div id='myBar'>"+Math.round(percentageFinished)+"%</div></div></div>"
+                    document.getElementById("myBar").innerText = Math.round(percentageFinished).toString() + "%"
                     document.getElementById("myBar").style.width = percentageFinished.toString() + "%"
+
 
                 } else {
                     document.getElementById("submit_status").innerHTML = "<br><br><br>Waiting in queue" ;
@@ -346,11 +456,13 @@
             result_container.innerHTML += "<span>View Your Files @&nbsp</span><a href='"+gburl+"' target='_blank'>WashU Epigenome Browser</a>"
             result_container.innerHTML += "<br><br><br>"
 
-            result_container.innerHTML += "<h3>Manifest</h3>"
 
             let manifest = document.createElement("table");
+            manifest.className = "table1";
+
             manifest.style = "width: 100%"
-            manifest.innerHTML = "  <tr>\n" +
+            let manifestinnerhtml = "<caption>Manifest</caption>";
+            manifestinnerhtml += "  <tr>\n" +
                 "    <th>Original File</th>\n" +
                 "    <th>Converted File</th>\n" +
                 "    <th>Error</th>\n" +
@@ -361,7 +473,7 @@
 
             for (let entries of fileMapping){
                 let indexFile = ""
-                if (["qbed", "bed"].includes(entries[2])){
+                if (["bed", "qbed", "cov", "methylc", "categorical", "refbed", "longrange"].includes(entries[2])){
                     indexFile = "&nbsp<a href='"+entries[3]+".tbi' target='_blank'>index</a>"
                 }
                 let error = "None";
@@ -372,12 +484,14 @@
                         error += "<br>"
                     }
                 }
-                manifest.innerHTML += "<tr>" +
+                manifestinnerhtml += "<tr>" +
                     "<td>"+entries[0]+"</td>" +
                     "<td><a href='"+entries[3]+"' target='_blank'>"+entries[2]+"</a>"+indexFile+"</td>" +
                     "<td>"+error+"</td>" +
                     "</tr>"
             }
+
+            manifest.innerHTML = manifestinnerhtml;
 
             result_container.appendChild(manifest)
 
